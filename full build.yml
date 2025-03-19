@@ -30,6 +30,89 @@ env:
   TARGET_NAME_rpm: "Hiddify-rpm-x64"
 
 jobs:
+  build_macos:
+    permissions: write-all
+    runs-on: macos-13
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2.16.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: Setup dependencies
+        run: |
+          make macos-install-dependencies
+
+      - name: Prepare for macOS
+        run: |
+          make macos-prepare
+          tree
+
+      - name: Build macOS
+        run: |
+          make macos-release
+
+      - name: Copy to out macOS
+        run: |
+          mkdir out
+          mv dist/*/*.dmg out/${TARGET_NAME_dmg}.dmg
+          mv dist/*/*.pkg out/${TARGET_NAME_pkg}.pkg
+
+      - name: Upload macOS Artifact
+        if: env.UPLOAD_ARTIFACT == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: macOS
+          path: ./out
+          retention-days: 1
+
+  build_apk:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2.13.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+          
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: '17'
+          
+      - name: Prepare for Android
+        run: |
+          make android-prepare
+          tree
+          
+      - name: Install Dependencies
+        run: |
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
+          dart run slang
+
+      - name: Build APK
+        run: |
+          flutter build apk --release
+
+      - name: Upload APK Artifact
+        if: env.UPLOAD_ARTIFACT == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: build/app/outputs/flutter-apk/*.apk
+          retention-days: 1
+
   build_windows:
     permissions: write-all
     runs-on: windows-latest
