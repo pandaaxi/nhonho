@@ -84,7 +84,7 @@ abstract class ConfigOptions {
 
   static final directDnsAddress = PreferencesNotifier.create<String, String>(
     "direct-dns-address",
-    "udp://1.1.1.1",
+    "udp://223.5.5.5",
     possibleValues: List.of([
       "local",
       "udp://223.5.5.5",
@@ -138,9 +138,11 @@ abstract class ConfigOptions {
 
   static final connectionTestUrl = PreferencesNotifier.create<String, String>(
     "connection-test-url",
-    "http://cp.cloudflare.com",
+    "http://www.google.com/generate_204",
     possibleValues: List.of([
       "http://connectivitycheck.gstatic.com/generate_204",
+      "http://www.google.com/generate_204",
+      "https://www.google.com/generate_204",
       "http://www.gstatic.com/generate_204",
       "https://www.gstatic.com/generate_204",
       "http://cp.cloudflare.com",
