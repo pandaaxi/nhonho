@@ -2,7 +2,7 @@
 
 abstract class Constants {
   static const appName = "Homiefroxy";
-  static const githubUrl = "https://github.com/hiddify/hiddify-next";
+  static const githubUrl = "https://homiefroxy.com";
   static const githubReleasesApiUrl =
       "https://api.github.com/repos/pandaaxi/Panda-APP-Releases/releases";
   static const githubLatestReleaseUrl =
