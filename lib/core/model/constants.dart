@@ -1,7 +1,5 @@
-// Need to change github to reversed site
-
 abstract class Constants {
-  static const appName = "Homiefroxy";
+  static const appName = "Hiddify";
   static const githubUrl = "https://github.com/hiddify/hiddify-next";
   static const githubReleasesApiUrl =
       "https://api.github.com/repos/pandaaxi/Panda-APP-Releases/releases";
