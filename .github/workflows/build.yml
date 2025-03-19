@@ -30,55 +30,59 @@ env:
   TARGET_NAME_rpm: "Hiddify-rpm-x64"
 
 jobs:
-  build_ios:
+  build_windows:
     permissions: write-all
-    runs-on: macos-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-  
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.16.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: 'stable'
           cache: true
-  
-      - name: Clean Flutter Build
+
+      - name: Install Windows Build Tools
         run: |
-          flutter clean
-  
-      - name: Get Flutter Packages
+          choco install visualstudio2022-workload-vctools -y
+          choco install cmake ninja -y
+
+      - name: Install flutter_distributor
+        run: flutter pub global activate flutter_distributor
+
+      - name: Add Pub Cache to PATH
+        run: |
+          $pubCachePath = "$env:USERPROFILE\AppData\Local\Pub\Cache\bin"
+          echo "$pubCachePath" >> $env:GITHUB_PATH
+        shell: pwsh
+
+      - name: Install Dependencies
         run: |
           flutter pub get
-  
-      - name: Reinstall iOS Dependencies
-        run: |
-          cd ios
-          rm -rf Pods Podfile.lock
-          pod install
-          
-      - name: Install tree
-        run: brew install tree
+          dart run build_runner build --delete-conflicting-outputs
+          dart run slang
 
-      - name: Prepare for iOS
+      - name: Prepare for Windows
         run: |
-          make ios-prepare
+          make windows-prepare
           tree
-  
-      - name: Build iOS (No Code Sign)
+
+      - name: Build Windows
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: |
-          flutter build ipa --no-codesign
-  
-      - name: Copy to out iOS
+          make windows-release
+
+      - name: Copy to out Windows
         run: |
-          mkdir out
-          mv build/ios/ipa/*.ipa out/${TARGET_NAME_ipa}.ipa
-  
-      - name: Upload iOS Artifact
+          tree
+          .\\scripts\\package_windows.ps1
+      - name: Upload Windows Artifact
         if: env.UPLOAD_ARTIFACT == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: iOS
+          name: windows
           path: ./out
           retention-days: 1
