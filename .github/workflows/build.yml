@@ -49,9 +49,6 @@ jobs:
           choco install visualstudio2022-workload-vctools -y
           choco install cmake ninja -y
 
-      - name: Install WiX Toolset
-        run: choco install wix3 -y
-
       - name: Install flutter_distributor
         run: flutter pub global activate flutter_distributor
 
@@ -81,8 +78,7 @@ jobs:
       - name: Copy to out Windows
         run: |
           tree
-          .\scripts\package_windows.ps1
-
+          .\\scripts\\package_windows.ps1
       - name: Upload Windows Artifact
         if: env.UPLOAD_ARTIFACT == 'true'
         uses: actions/upload-artifact@v4
