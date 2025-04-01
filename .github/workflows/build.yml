@@ -44,6 +44,20 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Install Windows Build Tools
+        run: |
+          choco install visualstudio2022-workload-vctools -y
+          choco install cmake ninja -y
+
+      - name: Install flutter_distributor
+        run: flutter pub global activate flutter_distributor
+
+      - name: Add Pub Cache to PATH
+        run: |
+          $pubCachePath = "$env:USERPROFILE\AppData\Local\Pub\Cache\bin"
+          echo "$pubCachePath" >> $env:GITHUB_PATH
+        shell: pwsh
+
       - name: Install Dependencies
         run: |
           flutter pub get
@@ -60,12 +74,11 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: |
           make windows-release
-  
+
       - name: Copy to out Windows
         run: |
           tree
           .\\scripts\\package_windows.ps1
-          
       - name: Upload Windows Artifact
         if: env.UPLOAD_ARTIFACT == 'true'
         uses: actions/upload-artifact@v4
