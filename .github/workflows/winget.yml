@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 env:
-    IDENTIFIER: ${{ endsWith(github.event.release.tag_name, 'main') && 'Hiddify.Next.Beta' || 'Hiddify.Next' }}
+    IDENTIFIER: ${{ endsWith(github.event.release.tag_name, 'dev') && 'Hiddify.Next.Beta' || 'Hiddify.Next' }}
 
 jobs:
   publish:
